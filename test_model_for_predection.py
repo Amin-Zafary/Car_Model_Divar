@@ -31,14 +31,13 @@ df = df[df.price != 0.0]
 
 #fill fuel column for rows that have nan value with 'بنزینی'
 df['fuel'] = df['fuel'].fillna(df.loc[1,'fuel'])
-#print(df.loc[: , 'fuel'])
+
 
 #fill engine_status column for rows that have nan value with 'نیاز به تعمیر'
 df['engine_status'] = df['engine_status'].fillna('نیاز به تعمیر')
 
-
+#feature engineering on gearbox features
 selected_rows = df[df['chassis_status'].isnull()]
-
 for index in selected_rows.index : 
     #print(index)
     if(str(df.loc[index , 'front_chassis']) == 'ضربه‌خورده' or str(df.loc[index , 'front_chassis']) == 'رنگ‌شده'):
@@ -61,11 +60,10 @@ for index in selected_rows.index :
 
 df = df.drop(columns=[ 'front_chassis' , 'rear_chassis'])
 
+# to see features on a file
 df.to_csv('test3.csv')
 
-
-
-
+#handeling ctegorical features
 num_df = df.select_dtypes(include=np.number)
 
 cat_df=df.select_dtypes(include=object)
@@ -91,7 +89,7 @@ cat_oe.reset_index(inplace=True,drop=True)
 new_df=pd.concat([num_df,cat_oe],axis=1)
 
 
-
+#feature scaling for numerical features
 scaler = StandardScaler()
 num_columns = ["traveled_kilometers" , "production_year" ]
 new_df[num_columns] = scaler.fit_transform(new_df[num_columns])
@@ -101,8 +99,8 @@ new_df.to_csv('test2.csv')
 x = new_df.drop(columns=["price"])
 y = new_df["price"]
 
+# training model
 x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.33,random_state=42)
-
 training_score = []
 testing_score = []
 def model_prediction(model):
@@ -118,9 +116,5 @@ def model_prediction(model):
     print(f"r2_Score of {model} model on Testing Data is:",b)
 
 
-#model_prediction(LinearRegression())
-#model_prediction(DecisionTreeRegressor())
+
 model_prediction(XGBRegressor())
-#model_prediction(AdaBoostRegressor())
-#model_prediction(GradientBoostingRegressor())
-#model_prediction(RandomForestRegressor())
